@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-import requests
-import json
 import config
+import csv
+import requests
+
+from datetime import datetime
+from pytz import timezone
 
 class Member:
     """Represents a member and her page, subs, etc"""
@@ -31,6 +34,8 @@ class Member:
             return int(res.json()['items'][0]['statistics']['subscriberCount'])
 
 def main():
+    tz = timezone('US/Eastern')
+
     holo_myth = [
         Member('Amelia Watson', 'UCyl1z3jo3XHR1riLFKG5UAg'),
         Member('Calliope Mori', 'UCL_qhgtOy0dy1Agp8vkySQg'),
@@ -39,12 +44,16 @@ def main():
         Member('Kiara Takanashi', 'UCHsx4Hqa-1ORjQTh9TYDhww')
     ]
 
+    with open('holo-en-stats.csv', 'a', newline='') as statsfile:
+        writer = csv.writer(statsfile)
+        date = [datetime.now(tz)]
+        writer.writerow(date + [member.subs for member in holo_myth])
+
     holo_myth.sort(reverse=True)
 
-    print('Current Sub Count Rankings for Hololive Myth')
+    print('Current Sub Count Rankings for Hololive Myth:')
     for member in holo_myth:
-        print(f'{member.name} with {member.subs} subs')
-
+        print(f'{member.name} with {member.subs // 1000}K subs')
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
