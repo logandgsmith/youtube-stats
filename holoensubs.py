@@ -64,6 +64,7 @@ def main():
     # Parse Arguments
     parser = argparse.ArgumentParser(description='Record and analyze information about groups of YouTubers')
     parser.add_help = True
+    parser.add_argument('path', nargs='?', default='./', help='Path to output .csv')
     parser.add_argument('-r', '--rankings', action='store_true', help='Display rankings on screen')
     parser.add_argument('-n', '--no-logging', action='store_true', help='Don\'t log to file')
     parser.add_argument('--version', action='version', version=__version__)
@@ -86,7 +87,7 @@ def main():
 
     # Write to a .csv file
     if not flags.no_logging:
-       with open('holo-en-stats.csv', 'a', newline='') as log_file:
+       with open(flags.path + 'holo_en_subs.csv', 'a', newline='') as log_file:
            writer = csv.writer(log_file)
            date = [datetime.now(tz)]
            writer.writerow(date + [member.subs for member in holo_myth.members])
