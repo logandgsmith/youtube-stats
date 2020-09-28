@@ -85,7 +85,7 @@ def main():
         show_rankings(holo_myth)
 
     # Write to a .csv file
-    if flags.no_logging:
+    if not flags.no_logging:
        with open('holo-en-stats.csv', 'a', newline='') as log_file:
            writer = csv.writer(log_file)
            date = [datetime.now(tz)]
