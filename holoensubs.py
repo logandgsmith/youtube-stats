@@ -87,7 +87,7 @@ def main():
 
     # Write to a .csv file
     if not flags.no_logging:
-       with open(flags.path + 'holo_en_subs.csv', 'a', newline='') as log_file:
+       with open(flags.path + 'holo-en-stats.csv', 'a', newline='') as log_file:
            writer = csv.writer(log_file)
            date = [datetime.now(tz)]
            writer.writerow(date + [member.subs for member in holo_myth.members])
