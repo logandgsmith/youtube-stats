@@ -38,7 +38,7 @@ class Member:
         return self.subs < other.subs
 
     def scrape_subs(self) -> int:
-        """Scrapes the subs from YouTube APU"""
+        """Scrapes the subs from YouTube API"""
         res = requests.get('https://www.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics'
                            + '&id=' + self.chan_id + '&key=' + config.api_key)
         if res.status_code != 200:
@@ -56,7 +56,7 @@ def show_rankings(group):
         if member.subs < 1000000:
             print(f'{member.name} with {member.subs // 1000}K subs')
         else:
-            print(f'{member.name} with {member.subs // 1000000}M subs')
+            print(f'{member.name} with {member.subs / 1000000:.2f}M subs')
 
 def main():
     tz = timezone('US/Eastern')
@@ -92,6 +92,5 @@ def main():
            date = [datetime.now(tz)]
            writer.writerow(date + [member.subs for member in holo_myth.members])
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main()
