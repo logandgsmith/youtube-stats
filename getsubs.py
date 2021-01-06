@@ -22,10 +22,18 @@ class Group:
 
 class Member:
     """Represents a member of a group's page, subs, etc"""
-    def __init__(self, name, chan_id):
-        self.name = name
+    def __init__(self, chan_id):
+        self.res = requests.get(
+                'https://www.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics'
+                           + '&id=' + chan_id + '&key=' + config.api_key
+        )
+
+        if self.res.status_code != 200:
+            return
+
+        self.name = self.res.json()['items'][0]['snippet']['title']
         self.chan_id = chan_id
-        self.subs = self.scrape_subs()
+        self.subs = int(self.res.json()['items'][0]['statistics']['subscriberCount'])
         self.rank = 0
 
     def __eq__(self, other):
@@ -36,16 +44,7 @@ class Member:
 
     def __gt__(self, other):
         return self.subs < other.subs
-
-    def scrape_subs(self) -> int:
-        """Scrapes the subs from YouTube API"""
-        res = requests.get('https://www.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails%2Cstatistics'
-                           + '&id=' + self.chan_id + '&key=' + config.api_key)
-        if res.status_code != 200:
-            return -1
-        else:
-            return int(res.json()['items'][0]['statistics']['subscriberCount'])
-
+    
 def show_rankings(group):
     """Sorts the group and prints their ranking"""
     group.members.sort(reverse=True)
@@ -70,15 +69,13 @@ def main():
     parser.add_argument('--version', action='version', version=__version__)
     flags = parser.parse_args()
 
-    # Create a group from the HoloEN Members
-    holo_myth_members = [
-        Member('Amelia Watson', 'UCyl1z3jo3XHR1riLFKG5UAg'),
-        Member('Calliope Mori', 'UCL_qhgtOy0dy1Agp8vkySQg'),
-        Member('Gura Gawr', 'UCoSrY_IQQVpmIRZ9Xf-y93g'),
-        Member('Ina\'nis Ninomae', 'UCMwGHR0BTZuLsmjY_NT5Pwg'),
-        Member('Kiara Takanashi', 'UCHsx4Hqa-1ORjQTh9TYDhww')
-    ]
+    holo_myth_members = []
+    with open('example_channels.txt') as channel_list:
+        channels = channel_list.readlines()
+        for chan_id in channels:
+           holo_myth_members.append(Member(chan_id))
 
+    # Create a group from the HoloEN Members
     holo_myth = Group('HoloLive Myth', holo_myth_members)
 
     # Display ranks in order if needed
